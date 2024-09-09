@@ -1,0 +1,70 @@
+---
+title: "Exploración de datos sobre comparación de casquillos"
+author: "Juan Sebastian Cely y Pedro Ravelo"
+output: html_document
+---
+
+## Códigos
+1 = Casquillo impreso
+
+2 = Casquillo metálico
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r packages, include = FALSE}
+library(tidyverse)
+library(readxl)
+library(knitr)
+```
+
+
+```{r data, include=FALSE}
+Harnezing <- read_excel("Data_Bees_Survival.xlsx", sheet = 1)
+Survival <- read_excel("Data_Bees_Survival.xlsx", sheet = 2)
+```
+
+
+```{r Exploring harnezing data, echo=FALSE}
+Harnezing$Type_Har <- factor(Harnezing$Type_Har)
+Harnezing$Researcher <- factor(Harnezing$Researcher)
+Harnezing %>%
+  ggplot(aes(x = Type_Har, y = Duration)) +
+  geom_boxplot() +
+  labs(title = "Duración procedimiento harnezado según el tipo de casquillo", x = "Casquillo",
+       y = "Duración")
+Harnezing %>%
+  ggplot(aes(x = Researcher, y = Duration)) +
+  geom_boxplot() +
+  labs(title = "Duración procedimiento harnezado para ambos investigadores", x = "Investigador",
+       y = "Duración")
+```
+
+
+```{r Exploring survival data, message = FALSE, echo=FALSE}
+time <- Harnezing %>%
+  group_by(Type_Har) %>%
+  summarize(x = mean(Duration))
+max_life <- Survival %>%
+  group_by(ID, Type_Har) %>%
+  summarise(max_life = max(Feeding_day))
+kable(max_life %>%
+  group_by(Type_Har) %>%
+  summarise(mean_days_alive = mean(max_life)), col.names = c("Casquillo", "Promedio supervivencia (días)"), caption = "Comparación del promedio de días de supervivencia para cada casquillo")
+max_life$Type_Har <- factor(max_life$Type_Har)
+max_life %>%
+  ggplot(aes(x = max_life, color = Type_Har)) +
+  geom_density() +
+  labs(title = "Distribución número de días de supervivencia para ambos casquillos", x = "Número de días",
+       y = "Distribución", color = "Tipo de casquillo")
+```
+
+```{r counting errors during harnezing process, echo=FALSE}
+number_errors <- Harnezing %>% 
+  mutate(yes_no_error = case_when(Error == 0 ~ 0, Error != 0 ~ 1)) %>%
+  group_by(Type_Har) %>%
+  summarize(total_errors = sum(yes_no_error))
+kable(number_errors, col.names = c("Casquillo", "Número total de errores"), caption = "Comparación de número total de errores cometidos para cada casquillo")
+```
+
