@@ -37,7 +37,7 @@ Harnezing %>%
   ggplot(aes(x = Type_Har, y = Duration)) +
   geom_boxplot() +
   stat_summary(fun = "mean", geom = "point", shape = 18, size = 3, color = "red") + # Add mean
-  labs(x = "Harnessing Tube",
+  labs(x = "Harnessing tube",
        y = "Duration (s)") +
   theme_minimal(base_size = 14) +
   theme(plot.title = element_text(hjust = 0.5))
@@ -74,17 +74,21 @@ max_life <- Survival %>%
 kable(max_life %>%
   group_by(Type_Har) %>%
   summarise(mean_days_alive = mean(max_life)), 
-  col.names = c("Harnessing Tube", "Average Survival (days)"), 
+  col.names = c("Harnessing tube", "Average survival (days)"), 
   caption = "Comparison of the average survival days for each harnessing tube")
 
 max_life$Type_Har <- factor(max_life$Type_Har, levels = c(1, 2), labels = c("3D", "Metallic"))
 
 max_life %>%
-  ggplot(aes(x = max_life, color = Type_Har)) +
-  geom_density() +
+  ggplot(aes(x = max_life, fill = Type_Har)) +
+  geom_bar(position = "dodge", color = "black") + 
+  scale_fill_manual(values = c("3D" = "red", "Metallic" = "blue")) +
   labs(x = "Number of days alive",
-       y = "Distribution", color = "Harnessing tube") +
-  theme_minimal(base_size = 14)
+       y = "Number of subjects",
+       fill = "Harnessing tube") +
+  scale_y_continuous(breaks = seq(0, 13, 1)) +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ```{r counting errors during harnezing process, echo=FALSE}
@@ -102,7 +106,8 @@ ggplot(number_errors, aes(x = Type_Har, y = total_errors, fill = Type_Har)) +
        y = "Total number of errors") +
   theme_minimal(base_size = 14) +
   theme(plot.title = element_text(hjust = 0.5)) +
-  scale_fill_manual(values = c("3D" = "#619CFF", "Metallic" = "#F8766D")) +
+  scale_fill_manual(values = c("3D" = "red", "Metallic" = "blue")) +
+  scale_y_continuous(breaks = seq(0, 18, 2), limits = c(0 , 18)) +
   guides(fill = "none")
 
 ```
