@@ -1,5 +1,0 @@
-install.packages("tidyverse")
-install.packages("readxl")
-library(tidyverse)
-library(readxl)
-read_excel("Data_Bees_Survival")
