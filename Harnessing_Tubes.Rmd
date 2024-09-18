@@ -1,13 +1,13 @@
 ---
-title: "Exploración de datos sobre comparación de casquillos"
+title: "Data analysis for comparison of harnessing tubes"
 author: "Juan Sebastian Cely y Pedro Ravelo"
 output: html_document
 ---
 
-## Códigos
-1 = Casquillo impreso
+## Coding
+1 = 3D
 
-2 = Casquillo metálico
+2 = Metallic
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -29,20 +29,20 @@ Survival <- read_excel("Data_Bees_Survival.xlsx", sheet = 2)
 ```{r Exploring harnezing data, echo=FALSE}
 # Boxplot for Type_Har
 
-# Updating factor labels for Type_Har
+# Factor labels for Type_Har
 Harnezing$Type_Har <- factor(Harnezing$Type_Har, levels = c(1, 2), labels = c("3D", "Metallic"))
 
-# Boxplot for Type_Har with updated labels
+# Boxplot for Type_Har
 Harnezing %>%
   ggplot(aes(x = Type_Har, y = Duration)) +
   geom_boxplot() +
   stat_summary(fun = "mean", geom = "point", shape = 18, size = 3, color = "red") + # Add mean
   labs(x = "Harnessing Tube",
        y = "Duration (s)") +
-  theme_minimal(base_size = 14) +  # Clean theme, larger font
-  theme(plot.title = element_text(hjust = 0.5)) # Center title
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5))
 
-# Updating factor labels for Type_Har
+# Factor labels for Type_Har
 Harnezing$Researcher <- factor(Harnezing$Researcher, levels = c(0, 1, 2), labels = c("A", "B", "C"))
 
 # Filter data to only include Researchers A and B
@@ -57,7 +57,7 @@ Harnezing_filtered %>%
   labs(x = "Researcher",
        y = "Duration (s)") +
   theme_minimal(base_size = 14) +
-  theme(plot.title = element_text(hjust = 0.5)) # Center title
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -66,19 +66,25 @@ Harnezing_filtered %>%
 time <- Harnezing %>%
   group_by(Type_Har) %>%
   summarize(x = mean(Duration))
+
 max_life <- Survival %>%
   group_by(ID, Type_Har) %>%
   summarise(max_life = max(Feeding_day))
+
 kable(max_life %>%
   group_by(Type_Har) %>%
-  summarise(mean_days_alive = mean(max_life)), col.names = c("Casquillo", "Promedio supervivencia (días)"), caption = "Comparación del promedio de días de supervivencia para cada casquillo")
+  summarise(mean_days_alive = mean(max_life)), 
+  col.names = c("Harnessing Tube", "Average Survival (days)"), 
+  caption = "Comparison of the average survival days for each harnessing tube")
+
 max_life$Type_Har <- factor(max_life$Type_Har, levels = c(1, 2), labels = c("3D", "Metallic"))
+
 max_life %>%
   ggplot(aes(x = max_life, color = Type_Har)) +
   geom_density() +
   labs(x = "Number of days alive",
        y = "Distribution", color = "Harnessing tube") +
-theme_minimal(base_size = 14)
+  theme_minimal(base_size = 14)
 ```
 
 ```{r counting errors during harnezing process, echo=FALSE}
@@ -91,12 +97,12 @@ number_errors <- Harnezing %>%
 
 # Bar plot for total errors by Type_Har (Harnessing Tube)
 ggplot(number_errors, aes(x = Type_Har, y = total_errors, fill = Type_Har)) +
-  geom_bar(stat = "identity", color = "black") +  # Bar plot with borders
+  geom_bar(stat = "identity", color = "black") +
   labs(x = "Harnessing tube",
        y = "Total number of errors") +
-  theme_minimal(base_size = 14) +  # Clean theme with larger fonts
-  theme(plot.title = element_text(hjust = 0.5)) +  # Center title
-  scale_fill_manual(values = c("3D" = "#619CFF", "Metallic" = "#F8766D")) +  # Custom colors
-  guides(fill = "none")  # Remove legend, since x-axis labels describe the data
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_fill_manual(values = c("3D" = "#619CFF", "Metallic" = "#F8766D")) +
+  guides(fill = "none")
 
 ```
